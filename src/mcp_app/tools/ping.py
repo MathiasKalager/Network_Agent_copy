@@ -1,7 +1,8 @@
 import logging
 
 import asyncssh
-from utils.routers import get_router
+
+from ..utils.routers import get_router
 
 
 async def ping(router_name: str, destination: str, source: str = None) -> dict:

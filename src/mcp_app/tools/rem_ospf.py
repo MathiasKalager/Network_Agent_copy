@@ -1,7 +1,7 @@
 # ospf_tools.py
 import logging
-from utils.common import get_client, encode_intf
-from utils.routers import get_router
+from ..utils.common import get_client, encode_intf
+from ..utils.routers import get_router
 
 # --- OSPF PROSESSSTYRING ---
 

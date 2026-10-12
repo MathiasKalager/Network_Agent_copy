@@ -3,8 +3,8 @@ import json  # noqa: F401
 import logging
 import urllib.parse  # noqa: F401
 
-from utils.common import encode_intf, get_client
-from utils.routers import get_router
+from ..utils.common import encode_intf, get_client
+from ..utils.routers import get_router
 
 
 async def create_standard_acl(

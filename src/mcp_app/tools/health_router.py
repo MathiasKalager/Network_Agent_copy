@@ -1,7 +1,7 @@
 import logging
 
-from utils.common import get_client
-from utils.routers import get_router
+from ..utils.common import get_client
+from ..utils.routers import get_router
 
 # ----------------- INDIVIDUELLE VERKTØY -----------------
 

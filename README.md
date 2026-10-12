@@ -8,10 +8,10 @@
    source .venv/bin/activate
    ```
 
-3. Install dependencies:
    ```bash
    pip install -e .
    ```
+
 
 4. Copy and configure the environment file:
    ```bash
@@ -19,7 +19,7 @@
    # Edit .env to add your OpenAI API key and other required variables
    ```
 
-5. Configure routers in `src/mcp_app/utils/routers.py`:
+5. Configure routers in `src/mcp/utils/routers.py`:
    - Update the `ROUTERS` dictionary with your actual router details (IP addresses, usernames, passwords).
    - Each router must have RESTCONF enabled to use MCP tools.
    - For ping and traceroute functionality, routers must have SSH enabled.
@@ -29,8 +29,8 @@
 use python or python3 depending on which is used
 
 ### Start the MCP Server
-
-The MCP server provides tools for network operations and should load before the agent:
+       cp .env.example .env
+       nano .env
 
 ```bash
 python -m mcp_app.server

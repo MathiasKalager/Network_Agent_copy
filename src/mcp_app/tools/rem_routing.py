@@ -1,8 +1,8 @@
 # static_route.py
 import logging
 
-from utils.common import get_client
-from utils.routers import get_router
+from ..utils.common import get_client
+from ..utils.routers import get_router
 
 
 async def add_static_route(router_name: str, network: str, mask: str, next_hop: str) -> dict:

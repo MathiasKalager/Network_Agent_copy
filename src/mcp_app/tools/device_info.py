@@ -1,8 +1,8 @@
 # device_info.py
 import logging
 
-from utils.common import get_client
-from utils.routers import get_router
+from ..utils.common import get_client
+from ..utils.routers import get_router
 
 
 async def get_running_config(router_name: str) -> dict:

@@ -12,7 +12,7 @@ fi
 
 cd "$ROOT_DIR"
 
-"$PYTHON" "$ROOT_DIR/src/mcp/server.py" &
+"$PYTHON" -m mcp_app.server &
 MCP_PID=$!
 
 cleanup() {
