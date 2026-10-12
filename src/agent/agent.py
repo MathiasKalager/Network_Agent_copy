@@ -10,8 +10,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
-from utils.json_logger import dump_messages, log_event
-from utils.sanitize_message import sanitize_messages
+
+from .utils.sanitize_message import sanitize_messages
 
 load_dotenv()
 
@@ -25,8 +25,6 @@ class AgentState(TypedDict):
     user_input: str
 
 def ingestion(state: AgentState) -> dict:
-    log_event("ingestion", "enter", {"state": state})
-
     user_text = state.get("user_input", "").strip()
     if not user_text:
         return {}
@@ -44,53 +42,25 @@ def ingestion(state: AgentState) -> dict:
 
     new_messages.append(HumanMessage(content=user_text))
 
-    result = {"messages": new_messages}
-
-    log_event(
-        "ingestion",
-        "exit",
-        {"messages": dump_messages(new_messages)}
-    )
-
-    return result
+    return {"messages": new_messages}
 
 def build_graph(llm, tools):
     async def agent(state: AgentState) -> dict:
-        log_event(
-            "llm",
-            "enter",
-            {"messages": dump_messages(state["messages"])}
-        )
         try:
             response = await llm.ainvoke(state["messages"])
         except Exception as e:
-            log_event("llm", "error", {"error": str(e)})
             if "tool_calls must be followed" in str(e):
                 repaired = sanitize_messages(state["messages"])
                 response = await llm.ainvoke(repaired)
                 return {"messages": [response]}
             raise
-        log_event(
-            "llm",
-            "exit",
-            {"response": dump_messages([response])}
-        )
-
         return {"messages": [response]}
 
     tool_node = ToolNode(tools)
     async def tools_wrapper(state: AgentState):
-        log_event(
-            "tools",
-            "enter",
-            {"messages": dump_messages(state["messages"])}
-        )
         try:
             result = await tool_node.ainvoke(state)
         except Exception as e:
-            log_event("tools", "error", {"error": str(e)})
-
-
             last_msg = state["messages"][-1]
             tool_calls = getattr(last_msg, "tool_calls", None) or []
             tool_responses = []
@@ -108,12 +78,6 @@ def build_graph(llm, tools):
                     )
                 )
             return {"messages": tool_responses}
-
-        log_event(
-            "tools",
-            "exit",
-            {"messages": dump_messages(result["messages"])}
-        )
 
         return result
 
@@ -148,8 +112,7 @@ async def main():
         tools = await client.get_tools()
 
     except Exception as e:
-        log_event("mcp", "error", {"error": str(e)})
-        print("Kunne ikke hente tools fra MCP")
+        print(f"Kunne ikke hente tools fra MCP: {e}")
         return
 
     llm = ChatOpenAI(model="gpt-5-mini", temperature=0).bind_tools(tools)
@@ -164,15 +127,8 @@ async def main():
         try:
             state = await app.ainvoke({"user_input": user_text}, config=config)
         except Exception as e:
-            log_event("graph", "error", {"error": str(e)})
-            print("Graf-feil. Se logger.")
+            print(f"Graf-feil: {e}")
             continue
-
-        log_event(
-            "graph",
-            "final_state",
-            {"messages": dump_messages(state["messages"])}
-        )
 
         # Siste AIMessage etter eventuelle tool-runder
         last = state["messages"][-1]

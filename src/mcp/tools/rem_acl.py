@@ -1,10 +1,11 @@
 # acl_tools.py
+import json  # noqa: F401
 import logging
-import json
-import urllib.parse 
+import urllib.parse  # noqa: F401
 
-from utils.common import get_client, encode_intf  
+from utils.common import encode_intf, get_client
 from utils.routers import get_router
+
 
 async def create_standard_acl(
     router_name: str, 
