@@ -43,3 +43,13 @@ The agent executes the monitoring, diagnosis, remediation, and verification work
 ```bash
 python -m agent.agent
 ```
+
+### Start MCP and Agent Together
+
+From the project root, start both processes with:
+
+```bash
+bash ./run-all.sh
+```
+
+The script waits five seconds for the MCP server before starting the agent. Set `MCP_STARTUP_DELAY` to change the delay.
