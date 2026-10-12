@@ -16,7 +16,6 @@
 4. Copy and configure the environment file:
    ```bash
    cp .env.example .env  # If example exists, otherwise create .env
-   # Edit .env to add your OpenAI API key and other required variables
    ```
 
 5. Configure routers in `src/mcp/utils/routers.py`:
@@ -24,21 +23,25 @@
    - Each router must have RESTCONF enabled to use MCP tools.
    - For ping and traceroute functionality, routers must have SSH enabled.
 
+## Configure the routing on eth0 before attaching the ethernet cable
+```bash
+sudo ip link set dev eth0 up
+sudo ip address replace 192.168.0.2/24 dev eth0
+
+sudo ip route replace 172.16.0.0/24 via 192.168.0.1 dev eth0
+sudo ip route replace 10.0.0.0/28 via 192.168.0.1 dev eth0
+sudo ip route replace 203.0.113.1/32 via 192.168.0.1 dev eth0
+```
+
 ## Running the System
 
 use python or python3 depending on which is used
 
-### Start the MCP Server
-       cp .env.example .env
-       nano .env
+### Start the MCP Server and Agent alone
 
 ```bash
 python -m mcp_app.server
 ```
-
-### Run the Agent
-
-The agent executes the monitoring, diagnosis, remediation, and verification workflow:
 
 ```bash
 python -m agent.agent
@@ -49,7 +52,6 @@ python -m agent.agent
 From the project root, start both processes with:
 
 ```bash
-bash ./run-all.sh
+chmod +x ./run-all.sh
+./run-all.sh
 ```
-
-The script waits five seconds for the MCP server before starting the agent. Set `MCP_STARTUP_DELAY` to change the delay.

@@ -18,6 +18,9 @@ load_dotenv()
 PROMPT = """You are a helpful network AI assistant. 
 You get tools from a mcp server.
 You are only allowed to use these tools.
+the router names are router1, router2, router3. Use this names when you call the tools. (map example: 1 -> router1...) 
+Answers should be concise, brief and to the point.
+Always reply with the executed toolnames in chronological order first, then the final answer to the user.
 """
 
 class AgentState(TypedDict):
