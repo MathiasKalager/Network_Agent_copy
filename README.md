@@ -12,7 +12,6 @@
    pip install -e .
    ```
 
-
 4. Copy and configure the environment file:
    ```bash
    cp .env.example .env  # If example exists, otherwise create .env
@@ -31,16 +30,6 @@ sudo nmcli connection up "eth0"
 ## Running the System
 
 use python or python3 depending on which is used
-
-### Start the MCP Server and Agent alone
-
-```bash
-python -m mcp_app.server
-```
-
-```bash
-python -m agent.agent
-```
 
 ### Start MCP and Agent Together
 
