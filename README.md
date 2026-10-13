@@ -23,16 +23,11 @@
    - Each router must have RESTCONF enabled to use MCP tools.
    - For ping and traceroute functionality, routers must have SSH enabled.
 
-## Configure the routing on eth0 before attaching the ethernet cable
+## Configure the routing on eth0 before attaching the ethernet cable 
 ```bash
-sudo ip link set dev eth0 up
-sudo ip address replace 192.168.0.2/24 dev eth0
-
-sudo ip route replace 172.16.0.0/24 via 192.168.0.1 dev eth0
-sudo ip route replace 10.0.0.0/28 via 192.168.0.1 dev eth0
-sudo ip route replace 203.0.113.1/32 via 192.168.0.1 dev eth0
+sudo nmcli connection modify "eth0"   connection.autoconnect yes   ipv4.method manual   ipv4.addresses 192.168.0.2/24   ipv4.gateway "192.168.0.1"   ipv4.never-default yes   ipv4.routes "172.16.0.0/24 192.168.0.1, 1.1.1.1/32 192.168.0.1, 2.2.2.0/24 192.168.0.1, 3.3.3.0/24 192.168.0.1"
+sudo nmcli connection up "eth0"
 ```
-
 ## Running the System
 
 use python or python3 depending on which is used

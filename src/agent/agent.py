@@ -19,8 +19,8 @@ PROMPT = """You are a helpful network AI assistant.
 You get tools from a mcp server.
 You are only allowed to use these tools.
 the router names are router1, router2, router3. Use this names when you call the tools. (map example: 1 -> router1...) 
+When tools are called, report each tool's name and whether its execution succeeded or failed, then give the answer. Do not infer that a router is down from a tool error alone. Be explicit about uncertainty.
 Answers should be concise, brief and to the point.
-Always reply with the executed toolnames in chronological order first, then the final answer to the user.
 """
 
 class AgentState(TypedDict):
@@ -29,23 +29,23 @@ class AgentState(TypedDict):
 
 def ingestion(state: AgentState) -> dict:
     user_text = state.get("user_input", "").strip()
+
     if not user_text:
         return {}
 
-    new_messages: list[BaseMessage] = []
-
     if not state.get("messages"):
-        new_messages.append(SystemMessage(content=PROMPT))
-    else:
-         repaired = sanitize_messages(state["messages"])
-         if len(repaired) > len(state["messages"]):
-            new_messages.extend(
-                repaired[len(state["messages"]):]
-            )
+        return {
+            "messages": [
+                SystemMessage(content=PROMPT),
+                HumanMessage(content=user_text),
+            ]
+        }
 
-    new_messages.append(HumanMessage(content=user_text))
-
-    return {"messages": new_messages}
+    return {
+        "messages": [
+            HumanMessage(content=user_text)
+        ]
+    }
 
 def build_graph(llm, tools):
     async def agent(state: AgentState) -> dict:
@@ -118,7 +118,14 @@ async def main():
         print(f"Kunne ikke hente tools fra MCP: {e}")
         return
 
-    llm = ChatOpenAI(model="gpt-5-mini", temperature=0).bind_tools(tools)
+    llm = ChatOpenAI(
+        model="gpt-6.1-sol",
+        reasoning_effort="medium",
+        use_responses_api=True,
+        timeout=120,
+        max_retries=2,
+    ).bind_tools(tools)
+
     app = build_graph(llm, tools)
 
     config = {"configurable": {"thread_id": "chat-1"}}
@@ -136,7 +143,7 @@ async def main():
         # Siste AIMessage etter eventuelle tool-runder
         last = state["messages"][-1]
         if isinstance(last, AIMessage):
-            print("Assistant:", last.content)
+            print("Assistant:", last.text)
 
 if __name__ == "__main__":
     try:
